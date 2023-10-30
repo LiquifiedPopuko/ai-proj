@@ -21,22 +21,22 @@ class BuildEstimator:
 
         search_params = {
             "model__hidden_layer_dim": [10, 50, 100],
-            "model__batch_size": [64, 128, 256, 512, 1024],
+            "model__batch_size": [64, 128],
             "model__epochs": [10, 25, 50],
-            "model__optimizer__learning_rate": [0.001, 0.01, 0.1],
+            "model__optimizer__learning_rate": [0.01, 0.1],
         }
         pipe = Pipeline(
             [
                 ("standard_scaler", StandardScaler()),
-                ("pca", PCA(n_components=0.5, svd_solver="full")),
+                ("pca", PCA(n_components=0.3, svd_solver="full")),
                 (
                     "model",
                     KerasRegressor(
                         model=BuildEstimator.createModel,
                         verbose=0,
-                        loss="mean_absolute_error",
+                        loss=tf.keras.losses.mean_squared_error,
                         optimizer="adam",
-                        hidden_layer_dim="100"
+                        hidden_layer_dim="100",
                     ),
                 ),
             ]
@@ -69,21 +69,36 @@ class BuildEstimator:
         n_features_in_ = meta["n_features_in_"]
         X_shape_ = meta["X_shape_"]
         model = tf.keras.models.Sequential()
-        model.add(tf.keras.layers.Dense(n_features_in_, input_shape=X_shape_[1:], kernel_initializer='normal'))
         model.add(
             tf.keras.layers.Dense(
-                hidden_layer_dim, activation="relu", kernel_initializer='normal'
+                n_features_in_, input_shape=X_shape_[1:], kernel_initializer="normal"
             )
         )
         model.add(
             tf.keras.layers.Dense(
-                hidden_layer_dim, activation="relu", kernel_initializer='normal'
+                hidden_layer_dim,
+                activation="relu",
+                kernel_initializer="normal",
+                kernel_regularizer="l2",
             )
         )
         model.add(
             tf.keras.layers.Dense(
-                hidden_layer_dim, activation="relu", kernel_initializer='normal'
+                hidden_layer_dim,
+                activation="relu",
+                kernel_initializer="normal",
+                kernel_regularizer="l2",
             )
         )
-        model.add(tf.keras.layers.Dense(1, activation="linear", kernel_initializer='normal'))
+        model.add(
+            tf.keras.layers.Dense(
+                hidden_layer_dim,
+                activation="relu",
+                kernel_initializer="normal",
+                kernel_regularizer="l2",
+            )
+        )
+        model.add(
+            tf.keras.layers.Dense(1, activation="linear", kernel_initializer="normal")
+        )
         return model

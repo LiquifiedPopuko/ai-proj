@@ -18,16 +18,16 @@ if __name__ == "__main__":
     data["query"] = data.drop("SalePrice", axis=1).apply(
         lambda x: convert_to_query(x), axis=1
     )
-    dataframe_test = data.head(25)
+    dataframe_test = data
     dataframe_test["predict_nn"] = dataframe_test.apply(
-        lambda x: requests.get(r"http://127.0.0.1:5000/estimate?" + x["query"]).json()[
+        lambda x: requests.get(r"http://127.0.0.1:80/estimate?" + x["query"]).json()[
             "rating"
         ],
         axis=1,
     ).astype("float64")
     dataframe_test["predict_reg"] = dataframe_test.apply(
         lambda x: requests.get(
-            r"http://127.0.0.1:5000/estimate-regression?" + x["query"]
+            r"http://127.0.0.1:80/estimate-regression?" + x["query"]
         ).json()["rating"],
         axis=1,
     ).astype("float64")

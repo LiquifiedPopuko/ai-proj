@@ -1,20 +1,17 @@
-version: '3'
+version: "3.8"
 
 services:
+    api:
+        container_name: 411-api
+        build: ./api
+        expose:
+            - "5000"
+        command: python estimationService.py
 
-  api:
-    container_name: 411-api
-    restart: always
-    build: ./api
-    expose:
-      - "5000"
-    command: python estimationService.py
-
-  nginx:
-    container_name: 411-nginx
-    restart: always
-    build: ./nginx
-    ports:
-      - "80:80"
-    depends_on:
-      - api
+    nginx:
+        container_name: 411-nginx
+        build: ./nginx
+        ports:
+            - "80:80"
+        depends_on:
+            - api

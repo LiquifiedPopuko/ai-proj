@@ -2,6 +2,9 @@ from flask import Flask, jsonify, request
 from getResources import GetResources
 from collections import OrderedDict
 import pandas as pd
+import tensorflow as tf
+
+print(tf.__version__)
 
 app = Flask(__name__)
 app.model = GetResources.getModel()
@@ -74,4 +77,4 @@ def hello():
 	return 'hello'
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(debug=True, host='0.0.0.0')
